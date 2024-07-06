@@ -51,6 +51,9 @@ To run the script, use your Python interpreter to execute the script file.
 ### Output
 
 The script will create a CSV file named `power_bi_performance_data.csv` with the collected performance data.
+You can load the data to Power BI and have the clear results of the performance of the reports in your PBI service.
+![obraz](https://github.com/AstralForest/Power_BI_Service_Perfomance_Tracking/assets/103418860/cae69a25-681a-446a-b819-a2d4b02c6f6e)
+
 
 ## Troubleshooting
 
