@@ -79,7 +79,8 @@ You can get the most value from the performance information once you mix this da
 
 ## Authors
 
-- Michal Debski (michal.debski@astralforest.com)
+- Michał Dębski (michal.debski@astralforest.com)
+- Michał Jełowicki (michal.jelowicki@astralforest.com)
 
 ---
 
