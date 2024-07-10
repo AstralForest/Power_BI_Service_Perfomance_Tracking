@@ -4,12 +4,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.action_chains import ActionChains
 import chromedriver_autoinstaller
 import time
 import pandas as pd
-import os
 
 # Automatically install chromedriver if not available
 chromedriver_autoinstaller.install()
@@ -25,8 +23,8 @@ service = Service()
 driver = webdriver.Chrome(service=service, options=options)
 
 # Load credentials from environment variables
-email = ('your email')
-password = ('your password')
+email = ('mail')
+password = ('password')
 
 # Open Power BI and log in
 driver.get('https://app.powerbi.com/')
@@ -40,7 +38,7 @@ time.sleep(2)
 password_field = driver.find_element(By.NAME, 'passwd')
 password_field.send_keys(password)
 password_field.send_keys(Keys.RETURN)
-time.sleep(2)
+time.sleep(25)
 
 # Read the CSV file containing report and page information
 csv_file_path = 'power_bi_reports_pages.csv'
@@ -89,10 +87,10 @@ def hover_and_close_tabs(driver):
 
 # Loop through each report page listed in the CSV
 for index, row in reports_pages_df.iterrows():
-    workspace_id = row['workspace_id']
-    report_id = row['report_id']
-    page_name = row['page_name']
-    report_url = row['url']
+    workspace_id = row['Workspace ID']
+    report_id = row['Report ID']
+    page_name = row['Page Name']
+    report_url = row['URL']
     print(f"Processing row {index} ,  {report_url}")
     try:
         # Navigate to the report page
