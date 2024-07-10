@@ -23,8 +23,8 @@ service = Service()
 driver = webdriver.Chrome(service=service, options=options)
 
 # Load credentials from environment variables
-email = ('mail')
-password = ('password')
+email = os.getenv('POWERBI_EMAIL', 'your email') 
+password = os.getenv('POWERBI_PASSWORD', 'your password')
 
 # Open Power BI and log in
 driver.get('https://app.powerbi.com/')
