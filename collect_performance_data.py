@@ -66,7 +66,7 @@ def hover_and_close_tabs(driver):
 
                     # Wait until the close button within the current tab item is present and clickable
                     close_button = WebDriverWait(driver, 10).until(
-                        EC.element_to_be_clickable(navbar_tab_item.find_element(By.CSS_SELECTOR, 'tri-svg-icon[data-testid="tab-close"]'))
+                        EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[data-testid="tab-close"]'))
                     )
 
                     # Click on the close button
