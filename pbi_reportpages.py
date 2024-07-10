@@ -3,14 +3,14 @@ import requests
 import pandas as pd
 
 # Authentication details provide the necessary information from your app registration 
-client_id = 'your client id'
-client_secret = 'your client secret'
-tenant_id = 'your tenant id'
+client_id = ''
+client_secret = ''
+tenant_id = ''
 
 # Power BI workspace IDs - provide the list of the workspaces you want to scrap the data from in order to list the Reports and Reportages from them
 workspace_ids = [
-    'workspace id 1',
-    'workspace id 2'
+    'workspaceid1',
+    'workspaceid2'
 ]
 
 # Authenticate and get access token
