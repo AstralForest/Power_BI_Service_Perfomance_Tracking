@@ -23,7 +23,7 @@ service = Service()
 driver = webdriver.Chrome(service=service, options=options)
 
 # Load credentials from environment variables
-email = os.getenv('POWERBI_EMAIL', 'your email') 
+email = os.getenv('POWERBI_EMAIL', 'your email')
 password = os.getenv('POWERBI_PASSWORD', 'your password')
 
 # Open Power BI and log in
@@ -42,8 +42,9 @@ time.sleep(25)
 
 # Read the CSV file containing report and page information
 csv_file_path = 'power_bi_reports_pages.csv'
-reports_pages_df = pd.read_csv(csv_file_path)#,skiprows=range(1, 230), nrows=8)  #skiprows=range(1, 218), nrows=30) 
+reports_pages_df = pd.read_csv(csv_file_path)
 print(reports_pages_df)
+
 # Initialize an empty DataFrame to store all performance data
 all_performance_data = pd.DataFrame()
 
@@ -85,44 +86,62 @@ def hover_and_close_tabs(driver):
             print(f"An error occurred: {e}")
             break
 
-# Loop through each report page listed in the CSV
-for index, row in reports_pages_df.iterrows():
-    workspace_id = row['Workspace ID']
-    report_id = row['Report ID']
-    page_name = row['Page Name']
-    report_url = row['URL']
-    print(f"Processing row {index} ,  {report_url}")
+# Function to collect performance data for a report page
+def collect_performance_data(driver, report_url, workspace_id, report_id, page_name, pass_number):
     try:
         # Navigate to the report page
         driver.get(report_url)
         time.sleep(2)  # Adjust the wait time as needed
+
         # Start performance tracing
         driver.execute_script('window.performance.mark("start");')
+
         # Wait for a while to allow the page to load
         WebDriverWait(driver, 120).until(lambda d: d.execute_script('return document.readyState') == 'complete')
-          # Adjust the wait time as needed -> for the long-loading report it may be not enough, but still this allows you to list those trouble-makers
+
         # Stop performance tracing and collect data
         driver.execute_script('window.performance.mark("end");')
         driver.execute_script('window.performance.measure("duration", "start", "end");')
         performance_data = driver.execute_script('return window.performance.getEntriesByType("measure");')
+
         # Convert performance data to DataFrame
         df = pd.DataFrame(performance_data)
+
         # Convert startTime and duration to seconds with 2 decimals
         df['startTime'] = (df['startTime'] / 1000).round(2)
         df['duration'] = (df['duration'] / 1000).round(2)
-        # Add additional columns with report and page information
+
+        # Add additional columns with report, page information, and pass number
         df['workspace_id'] = workspace_id
         df['report_id'] = report_id
         df['page_name'] = page_name
         df['timestamp'] = time.strftime('%Y-%m-%d %H:%M:%S')
-        # Append the performance data to the all_performance_data DataFrame
-        all_performance_data = pd.concat([all_performance_data, df], ignore_index=True)
-        # Call the function to hover and close tabs
-        hover_and_close_tabs(driver)    
-    except Exception as e:
-        print(f"An error occurred while processing row {index}: {e}")
+        df['pass'] = pass_number
 
-print(all_performance_data)
+        return df
+
+    except Exception as e:
+        print(f"An error occurred while processing {report_url} on pass {pass_number}: {e}")
+        return pd.DataFrame()  # Return an empty DataFrame in case of error
+
+# Loop through each report page listed in the CSV
+for index, row in reports_pages_df.iterrows():
+    workspace_id = row['workspace_id']
+    report_id = row['report_id']
+    page_name = row['page_name']
+    report_url = row['url']
+    
+    print(f"Processing row {index}, {report_url} - Pass 1")
+    df_pass1 = collect_performance_data(driver, report_url, workspace_id, report_id, page_name, 1)
+    all_performance_data = pd.concat([all_performance_data, df_pass1], ignore_index=True)
+    
+    print(f"Processing row {index}, {report_url} - Pass 2")
+    df_pass2 = collect_performance_data(driver, report_url, workspace_id, report_id, page_name, 2)
+    all_performance_data = pd.concat([all_performance_data, df_pass2], ignore_index=True)
+    
+    # Call the function to hover and close tabs after each pass
+    hover_and_close_tabs(driver)
+
 # Export all performance data to a CSV file
 output_csv_path = "power_bi_performance_data.csv"
 all_performance_data.to_csv(output_csv_path, index=False)
